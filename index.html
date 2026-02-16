@@ -36,7 +36,8 @@ a{color:var(--ac);text-decoration:none;}
 .qv-panel.open{display:block;}
 .qv-title{color:var(--ac);font-size:0.85rem;font-weight:700;margin-bottom:8px;}
 .qv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
-.qv-card{background:var(--cd);border:1px solid var(--bd);border-radius:8px;padding:8px;font-size:0.7rem;}
+.qv-card{background:var(--cd);border:1px solid var(--bd);border-radius:8px;padding:8px;font-size:0.7rem;display:block;color:inherit;transition:all 0.15s;}
+.qv-card:hover{border-color:var(--ac);transform:translateY(-1px);text-decoration:none;color:inherit;}
 .qv-card strong{color:var(--text);}
 .qv-card div{color:var(--mt);font-size:0.65rem;margin-top:2px;}
 
@@ -57,6 +58,8 @@ a{color:var(--ac);text-decoration:none;}
 .eco-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px;}
 .eco-chip{background:var(--cd);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;font-size:0.65rem;white-space:nowrap;}
 .eco-chip:hover{border-color:var(--gold);}
+.cat-link{border-color:var(--green);}
+.cat-link:hover{background:rgba(63,185,80,0.15);}
 
 .chat-fab{position:fixed;right:10px;bottom:10px;z-index:999;background:rgba(0,0,0,0.85);color:#fff;border:1px solid var(--bd);border-radius:999px;padding:8px 12px;font-weight:700;font-size:0.75rem;cursor:pointer;}
 .chat-panel{position:fixed;right:6px;bottom:50px;z-index:999;width:calc(100vw - 12px);max-width:360px;height:min(350px,55vh);background:rgba(11,15,20,0.95);border:1px solid var(--bd);border-radius:10px;display:none;flex-direction:column;overflow:hidden;}
@@ -111,6 +114,16 @@ a{color:var(--ac);text-decoration:none;}
 </div>
 
 <div class="section">
+  <h2>🏷️ Category Links</h2>
+  <div class="eco-row">
+    <a class="eco-chip cat-link" href="https://pewpi-infinity.github.io/infinity-viewer/">🔭 Viewer</a>
+    <a class="eco-chip cat-link" href="https://pewpi-infinity.github.io/infinity-directions/">🧭 Directions</a>
+    <a class="eco-chip cat-link" href="https://pewpi-infinity.github.io/infinity-travel/">✈️ Travel</a>
+    <a class="eco-chip cat-link" href="https://pewpi-infinity.github.io/infinity-religion/">🕊️ Religion</a>
+  </div>
+</div>
+
+<div class="section">
   <h2>⚡ Spark Network</h2>
   <div class="spark-grid" id="spark-grid"></div>
 </div>
@@ -147,7 +160,7 @@ a{color:var(--ac);text-decoration:none;}
   <div class="chat-head"><span>🧱 Portal Terminal</span><span id="cc" style="cursor:pointer">✕</span></div>
   <div class="chat-body" id="cb">
     <div class="chat-line" style="color:var(--gold)">Welcome to infinity-spark-portal</div>
-    <div class="chat-line" style="color:var(--mt)">Commands: help, role, sparks, status, ecosystem</div>
+    <div class="chat-line" style="color:var(--mt)">Commands: help, role, sparks, status, ecosystem, categories, links, navigate [name]</div>
   </div>
   <div class="chat-bar">
     <input class="chat-in" id="ci" placeholder="Type a command..."/>
@@ -157,7 +170,7 @@ a{color:var(--ac);text-decoration:none;}
 
 <script>
 // Spark Network Grid
-const SPARKS=[
+var SPARKS=[
   {n:"core",i:"💎"},{n:"bridge",i:"🌉"},{n:"terminal",i:"🖥️"},{n:"engine",i:"🔧"},
   {n:"hub",i:"🌐"},{n:"relay",i:"📡"},{n:"forge",i:"🔥"},{n:"vault",i:"🔐"},
   {n:"mint",i:"🏭"},{n:"token",i:"🪙"},{n:"portal",i:"🌀"},{n:"lab",i:"🧪"},
@@ -167,29 +180,21 @@ const SPARKS=[
   {n:"stream",i:"🌊"},{n:"network",i:"🌐"},{n:"vision",i:"👁️"},{n:"studio",i:"🎨"},
   {n:"launchpad",i:"🚀"},{n:"market",i:"💰"}
 ];
-const sg=document.getElementById("spark-grid");
-sg.innerHTML=SPARKS.map(s=>`<a class="spark-node" href="https://pewpi-infinity.github.io/infinity-spark-${s.n}/"><div class="spark-icon">${s.i}</div><div class="spark-name">${s.n}</div></a>`).join("");
+var sg=document.getElementById("spark-grid");
+sg.innerHTML=SPARKS.map(function(s){return '<a class="spark-node" href="https://pewpi-infinity.github.io/infinity-spark-'+s.n+'/"><div class="spark-icon">'+s.i+'</div><div class="spark-name">'+s.n+'</div></a>';}).join("");
 
-// Quantum Vector Buttons
-const QV={
-  double:{t:"🍄 Double Content",items:["Deep Research x2","Source Expander","Content Mirror","Facet Multiplier"]},
-  wallet:{t:"🟡 Token Wallet",items:["Token Balance","Mint Token","Transfer","History"]},
-  trending:{t:"⭐ Trending",items:["Trend Scanner","SEO Injector","Viral Builder","Comparison"]},
-  royal:{t:"👑 Royal Treatment",items:["AI Guide Suite","Trivia Games","Full Research","Content Perfector","Link Builder","Token Rewards"]},
-  facet:{t:"💎 Facet Extract",items:["Chunk Extractor","Diamond Cutter","Build Carrier","Facet Archive"]},
-  hash:{t:"🧱 Hash Protect",items:["Login Gate","Hash Encoder","Access Control","Integrity Check"]},
-  autobot:{t:"🦾 Auto-Bot",items:["Auto Re-check","Content Bot","Link Bot","Growth Bot"]},
-  pull:{t:"🧲 Pull",items:["Pull Content","Pull Structure","Pull Tokens","Pull Connections"]},
-  search:{t:"🕹️ Search",items:["Full Text Search","Spark Search","Ecosystem Search","Token Search"]}
-};
-document.querySelectorAll(".action-btn").forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll(".action-btn").forEach(b=>b.classList.remove("active"));
+// Quantum Vector Buttons - now with links
+var QV={"double": {"t": "\ud83c\udf44 Double Content", "items": [{"name": "Deep Research x2", "url": "https://pewpi-infinity.github.io/infinity-spark-research/", "desc": "Research engine"}, {"name": "Source Expander", "url": "https://pewpi-infinity.github.io/infinity-spark-scanner/", "desc": "Scanner system"}, {"name": "Content Mirror", "url": "https://pewpi-infinity.github.io/infinity-spark-archive/", "desc": "Archive mirror"}, {"name": "Facet Multiplier", "url": "https://pewpi-infinity.github.io/infinity-spark-matrix/", "desc": "Matrix transform"}]}, "wallet": {"t": "\ud83d\udfe1 Token Wallet", "items": [{"name": "Token Balance", "url": "https://pewpi-infinity.github.io/infinity-spark-token/", "desc": "Token tracker"}, {"name": "Mint Token", "url": "https://pewpi-infinity.github.io/infinity-spark-mint/", "desc": "Token mint"}, {"name": "Transfer", "url": "https://pewpi-infinity.github.io/infinity-spark-bridge/", "desc": "Bridge transfer"}, {"name": "History", "url": "https://pewpi-infinity.github.io/infinity-spark-ledger/", "desc": "Ledger history"}]}, "trending": {"t": "\u2b50 Trending", "items": [{"name": "Trend Scanner", "url": "https://pewpi-infinity.github.io/infinity-spark-scanner/", "desc": "Trend detection"}, {"name": "SEO Injector", "url": "https://pewpi-infinity.github.io/infinity-spark-search/", "desc": "Search boost"}, {"name": "Viral Builder", "url": "https://pewpi-infinity.github.io/infinity-spark-beacon/", "desc": "Beacon signal"}, {"name": "Comparison", "url": "https://pewpi-infinity.github.io/infinity-spark-atlas/", "desc": "Atlas compare"}]}, "royal": {"t": "\ud83d\udc51 Royal Treatment", "items": [{"name": "AI Guide Suite", "url": "https://pewpi-infinity.github.io/infinity-spark-vision/", "desc": "Vision AI"}, {"name": "Trivia Games", "url": "https://pewpi-infinity.github.io/infinity-spark-arena/", "desc": "Arena games"}, {"name": "Full Research", "url": "https://pewpi-infinity.github.io/infinity-spark-research/", "desc": "Deep research"}, {"name": "Content Perfector", "url": "https://pewpi-infinity.github.io/infinity-spark-writer/", "desc": "Writer engine"}]}, "facet": {"t": "\ud83d\udc8e Facet Extract", "items": [{"name": "Chunk Extractor", "url": "https://pewpi-infinity.github.io/infinity-spark-compiler/", "desc": "Compiler extract"}, {"name": "Diamond Cutter", "url": "https://pewpi-infinity.github.io/infinity-spark-forge/", "desc": "Forge refine"}, {"name": "Build Carrier", "url": "https://pewpi-infinity.github.io/infinity-spark-builder/", "desc": "Builder carry"}, {"name": "Facet Archive", "url": "https://pewpi-infinity.github.io/infinity-spark-archive/", "desc": "Archive store"}]}, "hash": {"t": "\ud83e\uddf1 Hash Protect", "items": [{"name": "Login Gate", "url": "https://pewpi-infinity.github.io/infinity-spark-gateway/", "desc": "Gateway access"}, {"name": "Hash Encoder", "url": "https://pewpi-infinity.github.io/infinity-spark-vault/", "desc": "Vault protect"}, {"name": "Access Control", "url": "https://pewpi-infinity.github.io/infinity-spark-control/", "desc": "Control system"}, {"name": "Integrity Check", "url": "https://pewpi-infinity.github.io/infinity-spark-scanner/", "desc": "Scanner verify"}]}, "autobot": {"t": "\ud83e\uddbe Auto-Bot", "items": [{"name": "Auto Re-check", "url": "https://pewpi-infinity.github.io/infinity-spark-operator/", "desc": "Operator auto"}, {"name": "Content Bot", "url": "https://pewpi-infinity.github.io/infinity-spark-writer/", "desc": "Writer bot"}, {"name": "Link Bot", "url": "https://pewpi-infinity.github.io/infinity-spark-nexus/", "desc": "Nexus linker"}, {"name": "Growth Bot", "url": "https://pewpi-infinity.github.io/infinity-spark-reactor/", "desc": "Reactor grow"}]}, "pull": {"t": "\ud83e\uddf2 Pull", "items": [{"name": "Pull Content", "url": "https://pewpi-infinity.github.io/infinity-spark-stream/", "desc": "Stream content"}, {"name": "Pull Structure", "url": "https://pewpi-infinity.github.io/infinity-spark-lattice/", "desc": "Lattice struct"}, {"name": "Pull Tokens", "url": "https://pewpi-infinity.github.io/infinity-spark-token/", "desc": "Token pull"}, {"name": "Pull Connections", "url": "https://pewpi-infinity.github.io/infinity-spark-network/", "desc": "Network connect"}]}, "search": {"t": "\ud83d\udd79\ufe0f Search", "items": [{"name": "Full Text Search", "url": "https://pewpi-infinity.github.io/infinity-spark-search/", "desc": "Search engine"}, {"name": "Spark Search", "url": "https://pewpi-infinity.github.io/infinity-spark-hub/", "desc": "Hub search"}, {"name": "Ecosystem Search", "url": "https://pewpi-infinity.github.io/infinity-spark-atlas/", "desc": "Atlas map"}, {"name": "Token Search", "url": "https://pewpi-infinity.github.io/infinity-spark-ledger/", "desc": "Ledger search"}]}};
+document.querySelectorAll(".action-btn").forEach(function(btn){
+  btn.onclick=function(){
+    document.querySelectorAll(".action-btn").forEach(function(b){b.classList.remove("active");});
     btn.classList.add("active");
-    const a=btn.dataset.action,d=QV[a];
+    var a=btn.dataset.action,d=QV[a];
     if(d){
       document.getElementById("qv-title").textContent=d.t;
-      document.getElementById("qv-grid").innerHTML=d.items.map(i=>`<div class="qv-card"><strong>${i}</strong><div>Ready</div></div>`).join("");
+      document.getElementById("qv-grid").innerHTML=d.items.map(function(i){
+        return '<a class="qv-card" href="'+i.url+'"><strong>'+i.name+'</strong><div>'+i.desc+'</div></a>';
+      }).join("");
       document.getElementById("qv-panel").classList.add("open");
     }
   };
@@ -197,23 +202,31 @@ document.querySelectorAll(".action-btn").forEach(btn=>{
 
 // Rogers Chat
 (function(){
-  const fab=document.getElementById("cf"),panel=document.getElementById("cp"),
+  var fab=document.getElementById("cf"),panel=document.getElementById("cp"),
     body=document.getElementById("cb"),input=document.getElementById("ci"),
     send=document.getElementById("cs"),close=document.getElementById("cc");
-  function line(t,c){const d=document.createElement("div");d.className="chat-line";if(c)d.style.color=c;d.textContent=t;body.appendChild(d);body.scrollTop=body.scrollHeight;}
-  fab.onclick=()=>{panel.style.display="flex";input.focus();};
-  close.onclick=()=>{panel.style.display="none";};
+  function line(t,c){var d=document.createElement("div");d.className="chat-line";if(c)d.style.color=c;d.textContent=t;body.appendChild(d);body.scrollTop=body.scrollHeight;}
+  fab.onclick=function(){panel.style.display="flex";input.focus();};
+  close.onclick=function(){panel.style.display="none";};
   function run(){
-    const q=(input.value||"").trim().toLowerCase();if(!q)return;
+    var q=(input.value||"").trim().toLowerCase();if(!q)return;
     line("> "+q,"var(--ac)");input.value="";
-    if(q==="help")line("Commands: help, role, sparks, status, ecosystem","var(--mt)");
+    if(q==="help")line("Commands: help, role, sparks, status, ecosystem, categories, links, navigate [name]","var(--mt)");
     else if(q==="role")line("🌀 Role: Portal Gateway - Portal to other dimensions of the ecosystem","var(--gold)");
     else if(q==="sparks")line("30 spark nodes connected via Crown Index","var(--gold)");
     else if(q==="status")line("⚡ infinity-spark-portal: ONLINE | Connected to Crown","var(--green)");
     else if(q==="ecosystem")line("👑Crown 🌐Hub 💰Market ⚡Core 🧱Octave 🎮Mario","var(--gold)");
-    else line("Unknown. Try: help","var(--mt)");
+    else if(q==="categories")line("🏷️ Linked categories: viewer, directions, travel, religion","var(--gold)");
+    else if(q==="links"){line("🔗 Category repos:","var(--gold)");line("  viewer, directions, travel, religion");line("⚡ Spark network: core, hub, market, bridge, +26 more");}
+    else if(q.startsWith("navigate ")){
+      var target=q.replace("navigate ","").trim();
+      var url="https://pewpi-infinity.github.io/infinity-"+target+"/";
+      line("🧭 Navigating to "+target+"...","var(--ac)");
+      setTimeout(function(){window.location.href=url;},500);
+    }
+    else line("Unknown. Try: help, role, categories, links, navigate [name]","var(--mt)");
   }
-  send.onclick=run;input.onkeydown=e=>{if(e.key==="Enter")run();};
+  send.onclick=run;input.onkeydown=function(e){if(e.key==="Enter")run();};
 })();
 </script>
 </body>
