@@ -140,4 +140,43 @@ export interface TradeOffer {
   expiresAt: number
 }
 
-export type ViewMode = 'home' | 'website' | 'wallet' | 'marketplace' | 'builder' | 'trading'
+export type ViewMode = 'home' | 'website' | 'wallet' | 'marketplace' | 'builder' | 'trading' | 'music' | 'dashboard' | 'terminal' | 'profile'
+
+export interface MusicTrack {
+  id: string
+  title: string
+  artist: string
+  album: string
+  source: string
+  duration: number
+  genre: string
+  addedAt: number
+  addedBy?: string
+}
+
+export interface UserProfile {
+  walletAddress: string
+  displayName: string
+  bio: string
+  avatar: string
+  joinedAt: number
+  stats: {
+    worldsCreated: number
+    worldsPurchased: number
+    tradesCompleted: number
+    totalEarned: number
+  }
+}
+
+export interface CartItem {
+  websiteId: string
+  price: number
+  addedAt: number
+}
+
+export interface TerminalCommand {
+  input: string
+  output: string
+  timestamp: number
+  type: 'success' | 'error' | 'info' | 'warning'
+}

@@ -2,7 +2,7 @@ import { Website, Wallet } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, Sparkle, Wallet as WalletIcon, Trophy, ArrowsLeftRight, Storefront } from '@phosphor-icons/react'
+import { ArrowLeft, Sparkle, Wallet as WalletIcon, Trophy, ArrowsLeftRight, Storefront, MusicNote, ChartBar, Terminal, User } from '@phosphor-icons/react'
 import { WebsiteCard } from '@/components/WebsiteCard'
 import { SlotMachine } from '@/components/SlotMachine'
 import { Leaderboard } from '@/components/Leaderboard'
@@ -17,6 +17,10 @@ interface InfinityHubViewProps {
   isCreating: boolean
   onNavigateTrading?: () => void
   onNavigateMarketplace?: () => void
+  onNavigateMusic?: () => void
+  onNavigateDashboard?: () => void
+  onNavigateTerminal?: () => void
+  onNavigateProfile?: () => void
 }
 
 export function InfinityHubView({ 
@@ -27,7 +31,11 @@ export function InfinityHubView({
   onCreateWithSlot,
   isCreating,
   onNavigateTrading,
-  onNavigateMarketplace
+  onNavigateMarketplace,
+  onNavigateMusic,
+  onNavigateDashboard,
+  onNavigateTerminal,
+  onNavigateProfile
 }: InfinityHubViewProps) {
   const myWebsites = websites.filter(w => w.ownerWallet === wallet?.address)
   const sortedByValue = [...myWebsites].sort((a, b) => b.value - a.value)
@@ -69,6 +77,46 @@ export function InfinityHubView({
               >
                 <ArrowsLeftRight size={20} />
                 World Trading
+              </Button>
+            )}
+            {onNavigateMusic && (
+              <Button
+                variant="outline"
+                onClick={onNavigateMusic}
+                className="gap-2 cosmic-border"
+              >
+                <MusicNote size={20} />
+                Music Hub
+              </Button>
+            )}
+            {onNavigateDashboard && (
+              <Button
+                variant="outline"
+                onClick={onNavigateDashboard}
+                className="gap-2 cosmic-border"
+              >
+                <ChartBar size={20} />
+                Dashboard
+              </Button>
+            )}
+            {onNavigateTerminal && (
+              <Button
+                variant="outline"
+                onClick={onNavigateTerminal}
+                className="gap-2 cosmic-border"
+              >
+                <Terminal size={20} />
+                Terminal
+              </Button>
+            )}
+            {onNavigateProfile && (
+              <Button
+                variant="outline"
+                onClick={onNavigateProfile}
+                className="gap-2 cosmic-border"
+              >
+                <User size={20} />
+                Profile
               </Button>
             )}
             {wallet && wallet.infinityBalance !== undefined && (
