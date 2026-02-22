@@ -254,6 +254,9 @@ function processCommand(
   }
 }
 
+const AUTOCOMPLETE_COMMANDS = ['help', 'ls', 'ls --all', 'top', 'balance', 'tokens', 'address', 'status', 'sparks', 'hub', 'market', 'trade', 'music', 'dash', 'profile', 'wallet', 'clear']
+const QUICK_COMMANDS = ['help', 'status', 'ls', 'top', 'balance', 'hub', 'market', 'music', 'clear']
+
 export function TerminalView({ websites, wallet, onBack, onNavigate }: TerminalViewProps) {
   const [history, setHistory] = useKV<TerminalCommand[]>('infinity-terminal-history', [])
   const [input, setInput] = useState('')
@@ -314,8 +317,7 @@ export function TerminalView({ websites, wallet, onBack, onNavigate }: TerminalV
       }
     } else if (e.key === 'Tab') {
       e.preventDefault()
-      const cmds = ['help', 'ls', 'ls --all', 'top', 'balance', 'tokens', 'address', 'status', 'sparks', 'hub', 'market', 'trade', 'music', 'dash', 'profile', 'wallet', 'clear']
-      const match = cmds.find(c => c.startsWith(input.toLowerCase()))
+      const match = AUTOCOMPLETE_COMMANDS.find(c => c.startsWith(input.toLowerCase()))
       if (match) setInput(match)
     }
   }
@@ -406,7 +408,7 @@ export function TerminalView({ websites, wallet, onBack, onNavigate }: TerminalV
 
           {/* Quick commands */}
           <div className="border-t cosmic-border px-4 py-3 flex flex-wrap gap-2">
-            {['help', 'status', 'ls', 'top', 'balance', 'hub', 'market', 'music', 'clear'].map(cmd => (
+            {QUICK_COMMANDS.map(cmd => (
               <button
                 key={cmd}
                 onClick={() => {

@@ -143,7 +143,14 @@ export function MarketplaceView({ websites, currentWallet, cart, onBack, onViewW
                         showPurchase
                       />
                       <button
-                        onClick={() => inCart ? onRemoveFromCart(website.id) : onAddToCart(website.id, website.salePrice || 0)}
+                        onClick={() => {
+                          if (inCart) {
+                            onRemoveFromCart(website.id)
+                          } else if (website.salePrice != null && website.salePrice > 0) {
+                            onAddToCart(website.id, website.salePrice)
+                          }
+                        }}
+                        disabled={!inCart && (website.salePrice == null || website.salePrice <= 0)}
                         className={`absolute top-3 right-3 p-2 rounded-lg transition-all text-xs flex items-center gap-1 ${
                           inCart
                             ? 'bg-accent/20 border border-accent/50 text-accent'

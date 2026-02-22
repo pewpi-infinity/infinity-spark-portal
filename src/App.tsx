@@ -786,7 +786,7 @@ function App() {
             const currentWallet = wallet
             if (!currentWallet) return
             const totalCost = items.reduce((sum, i) => sum + i.price, 0)
-            if (currentWallet.infinityBalance < totalCost) {
+            if ((currentWallet.infinityBalance ?? 0) < totalCost) {
               toast.error(`Insufficient balance. Need ${totalCost} ∞`)
               return
             }

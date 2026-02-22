@@ -50,7 +50,7 @@ export function ProfileView({ websites, wallet, transactions, onBack, onViewWebs
 
   const currentProfile = profile || (wallet ? {
     walletAddress: wallet.address,
-    displayName: `Spark User ${wallet.address.slice(-4)}`,
+    displayName: `Spark_${wallet.address.slice(0, 6)}`,
     bio: 'Exploring the Infinity ecosystem.',
     avatar: generateAvatar(wallet.address),
     joinedAt: wallet.createdAt,

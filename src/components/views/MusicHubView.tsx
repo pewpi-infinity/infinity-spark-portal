@@ -81,12 +81,21 @@ export function MusicHubView({ onBack, walletAddress }: MusicHubViewProps) {
   const currentTrack = trackList[currentTrackIndex]
   const liked = likedTracks || []
 
+  const isShuffleRef = useRef(isShuffle)
+  const trackListLengthRef = useRef(trackList.length)
+  useEffect(() => { isShuffleRef.current = isShuffle }, [isShuffle])
+  useEffect(() => { trackListLengthRef.current = trackList.length }, [trackList.length])
+
   useEffect(() => {
     if (isPlaying) {
       progressInterval.current = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
-            handleNext()
+            if (isShuffleRef.current) {
+              setCurrentTrackIndex(Math.floor(Math.random() * trackListLengthRef.current))
+            } else {
+              setCurrentTrackIndex(i => (i + 1) % trackListLengthRef.current)
+            }
             return 0
           }
           return prev + (100 / (currentTrack?.duration || 200))
