@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Website, Wallet, ViewMode, Token, Page, Transaction, TradeOffer } from '@/lib/types'
+import { Website, Wallet, ViewMode, Token, Page, Transaction, TradeOffer, CartItem } from '@/lib/types'
 import { WorldArchetype } from '@/lib/worldTypes'
 import { 
   generateWebsiteId, 
@@ -19,6 +19,10 @@ import { WebsiteView } from '@/components/views/WebsiteView'
 import { WalletView } from '@/components/views/WalletView'
 import { MarketplaceView } from '@/components/views/MarketplaceView'
 import { TradingView } from '@/components/views/TradingView'
+import { MusicHubView } from '@/components/views/MusicHubView'
+import { SparkDashboardView } from '@/components/views/SparkDashboardView'
+import { TerminalView } from '@/components/views/TerminalView'
+import { ProfileView } from '@/components/views/ProfileView'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 
@@ -27,6 +31,7 @@ function App() {
   const [wallet, setWallet] = useKV<Wallet | null>('infinity-wallet', null)
   const [transactions, setTransactions] = useKV<Transaction[]>('infinity-transactions', [])
   const [tradeOffers, setTradeOffers] = useKV<TradeOffer[]>('infinity-trade-offers', [])
+  const [cart, setCart] = useKV<CartItem[]>('infinity-cart', [])
   
   const [viewMode, setViewMode] = useState<ViewMode>('home')
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<string | null>(null)
@@ -515,6 +520,33 @@ function App() {
     setViewMode('marketplace')
   }
 
+  const handleNavigateMusic = () => {
+    setViewMode('music')
+  }
+
+  const handleNavigateDashboard = () => {
+    setViewMode('dashboard')
+  }
+
+  const handleNavigateTerminal = () => {
+    setViewMode('terminal')
+  }
+
+  const handleNavigateProfile = () => {
+    setViewMode('profile')
+  }
+
+  const handleNavigateWallet = () => {
+    if (wallet) setViewMode('wallet')
+  }
+
+  const handleTerminalNavigate = (view: string) => {
+    const validViews: ViewMode[] = ['home', 'website', 'wallet', 'marketplace', 'builder', 'trading', 'music', 'dashboard', 'terminal', 'profile']
+    if (validViews.includes(view as ViewMode)) {
+      setViewMode(view as ViewMode)
+    }
+  }
+
   const handleCreateTradeOffer = (offeredWebsiteId: string, requestedWebsiteId: string) => {
     if (!wallet) return
 
@@ -683,6 +715,10 @@ function App() {
           onSearch={handleSearchCreate}
           onEnterInfinity={handleEnterHub}
           isSearching={isCreating}
+          onNavigateMusic={handleNavigateMusic}
+          onNavigateDashboard={handleNavigateDashboard}
+          onNavigateTerminal={handleNavigateTerminal}
+          onNavigateMarketplace={handleNavigateMarketplace}
         />
       )}
 
@@ -696,6 +732,10 @@ function App() {
           isCreating={isCreating}
           onNavigateTrading={handleNavigateTrading}
           onNavigateMarketplace={handleNavigateMarketplace}
+          onNavigateMusic={handleNavigateMusic}
+          onNavigateDashboard={handleNavigateDashboard}
+          onNavigateTerminal={handleNavigateTerminal}
+          onNavigateProfile={handleNavigateProfile}
         />
       )}
 
@@ -725,9 +765,35 @@ function App() {
         <MarketplaceView
           websites={websites || []}
           currentWallet={wallet || null}
+          cart={cart || []}
           onBack={handleBackToEntry}
           onViewWebsite={handleViewWebsite}
           onPurchase={handlePurchaseWebsite}
+          onAddToCart={(websiteId, price) => {
+            setCart(prev => {
+              const current = prev || []
+              if (current.find(i => i.websiteId === websiteId)) return current
+              return [...current, { websiteId, price, addedAt: Date.now() }]
+            })
+            toast.success('Added to cart')
+          }}
+          onRemoveFromCart={(websiteId) => {
+            setCart(prev => (prev || []).filter(i => i.websiteId !== websiteId))
+          }}
+          onCheckoutCart={() => {
+            const items = cart || []
+            if (items.length === 0) return
+            const currentWallet = wallet
+            if (!currentWallet) return
+            const totalCost = items.reduce((sum, i) => sum + i.price, 0)
+            if ((currentWallet.infinityBalance ?? 0) < totalCost) {
+              toast.error(`Insufficient balance. Need ${totalCost} ∞`)
+              return
+            }
+            items.forEach(item => handlePurchaseWebsite(item.websiteId))
+            setCart([])
+            toast.success(`Purchased ${items.length} world(s)!`)
+          }}
         />
       )}
 
@@ -741,6 +807,43 @@ function App() {
           onAcceptTrade={handleAcceptTrade}
           onRejectTrade={handleRejectTrade}
           onCancelTrade={handleCancelTrade}
+          onViewWebsite={handleViewWebsite}
+        />
+      )}
+
+      {viewMode === 'music' && (
+        <MusicHubView
+          onBack={handleBackToEntry}
+          walletAddress={wallet?.address}
+        />
+      )}
+
+      {viewMode === 'dashboard' && (
+        <SparkDashboardView
+          websites={websites || []}
+          wallet={wallet || null}
+          transactions={transactions || []}
+          onBack={handleBackToEntry}
+          onNavigateMarketplace={handleNavigateMarketplace}
+          onNavigateTrading={handleNavigateTrading}
+        />
+      )}
+
+      {viewMode === 'terminal' && (
+        <TerminalView
+          websites={websites || []}
+          wallet={wallet || null}
+          onBack={handleBackToEntry}
+          onNavigate={handleTerminalNavigate}
+        />
+      )}
+
+      {viewMode === 'profile' && (
+        <ProfileView
+          websites={websites || []}
+          wallet={wallet || null}
+          transactions={transactions || []}
+          onBack={handleBackToEntry}
           onViewWebsite={handleViewWebsite}
         />
       )}
